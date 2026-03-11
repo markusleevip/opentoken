@@ -1,0 +1,52 @@
+system:
+  port: 8086
+  db-type: sqlite
+  oss-type: local
+  admin-user: [ "admin" ,"mark"]
+jwt:
+  signing-key: "opentoken-node"
+sqlite:
+  db-path: "/data/sqlite/opentoken-node.db"
+mysql:
+    prefix: ""
+    port: "3306"
+    config: charset=utf8mb4&parseTime=True&loc=Local
+    db-name: test
+    username: root
+    password: root
+    path: 127.0.0.1
+    engine: ""
+    log-mode: error
+    max-idle-conns: 10
+    max-open-conns: 100
+    singular: false
+    log-zap: false    
+zap:
+    level: info
+    prefix: ''
+    format: console
+    director: /data/logs/opentoken-node
+    encode-level: LowercaseColorLevelEncoder
+    stacktrace-key: stacktrace
+    show-line: true
+    log-in-console: true
+    retention-day: -1
+
+node-agent:
+    enabled: true
+    server-ws-url: ws://127.0.0.1:8084/ws/node
+    token: "U6JhBzt3nz_JpjfyafrjoV9wIFGLL3Es3KsPyo-8HNg"
+    node-name: node-local-1
+    models: ["glm-4.6"]
+    reconnect-backoff-sec: 5
+    handshake-timeout-sec: 10
+
+upstream-llm:
+    base-url: http://localhost:11434/v1
+    api-key: ""
+    chat-path: /chat/completions
+    timeout-sec: 120
+    insecure-skip-tls: false
+    model-map:
+      "qwen3.5-plus": "qwen3.5:9b"
+      

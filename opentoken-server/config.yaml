@@ -1,0 +1,34 @@
+system:
+  port: 8084
+  db-type: sqlite
+  oss-type: local
+  admin-user: [ "admin" ,"mark"]
+jwt:
+  signing-key: "opentoken-server"
+sqlite:
+  db-path: "/data/sqlite/opentoken-server.db"
+mysql:
+    prefix: ""
+    port: "3306"
+    config: charset=utf8mb4&parseTime=True&loc=Local
+    db-name: open_token
+    username: root
+    password: root
+    path: 127.0.0.1
+    engine: ""
+    log-mode: error
+    max-idle-conns: 10
+    max-open-conns: 100
+    singular: false
+    log-zap: false    
+zap:
+    level: info
+    prefix: ''
+    format: console
+    director: /data/logs/opentoken-server
+    encode-level: LowercaseColorLevelEncoder
+    stacktrace-key: stacktrace
+    show-line: true
+    log-in-console: true
+    retention-day: -1  
+
