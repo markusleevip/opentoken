@@ -80,7 +80,7 @@ func RegisterTables() {
 	// 逐个迁移表，便于定位问题
 	fmt.Println("Migrating core tables...")
 	db = db.WithContext(ctx)
-	if err := db.AutoMigrate(&model.Version{}, &model.User{}, &model.NodeCredential{}); err != nil {
+	if err := db.AutoMigrate(&model.Version{}, &model.User{}, &model.NodeCredential{}, &model.APIKey{}); err != nil {
 		global.GLB_LOG.Error("Core table migration failed", zap.Error(err))
 		os.Exit(1)
 	}

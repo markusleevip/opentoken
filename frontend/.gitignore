@@ -1,5 +1,9 @@
+
+# Editor/IDE
 .vscode
 .idea
+.idea/
+.vscode/
 .DS_Store
 # Binaries for programs and plugins
 *.exe
@@ -7,20 +11,14 @@
 *.dll
 *.so
 *.dylib
-
+node_modules/
+dist/
+build/
 # Test binary, built with `go test -c`
 *.test
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# Code coverage profiles and other test artifacts
 *.out
-
-# Dependency directories (remove the comment below to include it)
-# vendor/
-/log
-/logs
-*.log
-
-
 coverage.*
 *.coverprofile
 profile.cov
@@ -34,6 +32,4 @@ go.work.sum
 
 # env file
 .env
-config.local.yaml
-server
-server.exe
+

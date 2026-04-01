@@ -1,6 +1,6 @@
 # OpenToken
 
-[中文文档 (Chinese Documentation)](docs/README_zh.md)
+[中文文档](docs/README_zh.md)
 
 OpenToken is a high-performance, scalable LLM (Large Language Model) gateway and distribution system. It adopts a Server-Node architecture designed to provide developers with a unified, flexible, and secure API access point.
 
@@ -8,6 +8,7 @@ OpenToken is a high-performance, scalable LLM (Large Language Model) gateway and
 
 - **opentoken-server**: The central control node responsible for API routing, user authentication, node management, quota control, and frontend display.
 - **opentoken-node**: The execution node responsible for communicating with actual LLM upstreams (e.g., OpenAI, Anthropic, Ollama) and streaming back results.
+- **frontend**: The web frontend built with React + Vite + TypeScript, providing a user interface for managing and monitoring the system.
 
 ## Key Features
 
@@ -91,6 +92,57 @@ Navigate to the node directory and run:
 ```bash
 cd opentoken-node
 go run main.go
+```
+
+### 4. Frontend Configuration and Startup
+
+The frontend is a React application built with Vite and TypeScript.
+
+#### 4.1 Prerequisites
+
+- **Node.js**: Recommended version 18.x or higher.
+- **npm** or **yarn**: Package manager.
+
+#### 4.2 Install Dependencies
+
+Navigate to the frontend directory and install dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
+#### 4.3 Development Mode
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+The frontend will be available at `http://localhost:3000`. The development server automatically proxies API requests to the backend server at `http://localhost:8084`.
+
+#### 4.4 Production Build
+
+Build the frontend for production:
+
+```bash
+npm run build
+```
+
+The built files will be in the `dist` directory. You can preview the production build with:
+
+```bash
+npm run preview
+```
+
+#### 4.5 Test Environment
+
+For testing purposes, you can use:
+
+```bash
+npm run test:dev    # Start dev server in test mode
+npm run test:build  # Build for test environment
 ```
 
 ## Node Management & Monitoring
