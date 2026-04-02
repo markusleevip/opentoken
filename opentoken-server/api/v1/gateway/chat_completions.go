@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"opentoken-server/api/v1/apikey"
 	"opentoken-server/core"
 	"opentoken-server/domain/response"
 
@@ -14,6 +15,22 @@ import (
 )
 
 func ChatCompletions(c *gin.Context) {
+	// API Key 验证
+	token := extractAPIKey(c)
+	if token == "" {
+		response.NoAuth("missing authorization header", c)
+		return
+	}
+
+	apiKey, err := apikey.FindAPIKeyByToken(token)
+	if err != nil {
+		response.NoAuth(err.Error(), c)
+		return
+	}
+
+	// 异步更新最后使用时间
+	apikey.UpdateAPIKeyLastUsed(apiKey.ID)
+
 	var raw map[string]interface{}
 	if err := c.ShouldBindJSON(&raw); err != nil {
 		response.FailWithMessage("invalid request body", c)
@@ -69,7 +86,7 @@ func handleStreamingResponse(c *gin.Context, stream *core.PendingStream, nodeNam
 		flusher.Flush()
 	}
 
-	timeout := time.NewTimer(120 * time.Second)
+	timeout := time.NewTimer(6000 * time.Second)
 	defer timeout.Stop()
 
 	for {
@@ -93,7 +110,11 @@ func handleStreamingResponse(c *gin.Context, stream *core.PendingStream, nodeNam
 			if !ok {
 				continue
 			}
-			writeSSE(openAIChunk(nodeName, chunk))
+			timeout.Reset(6000 * time.Second)
+			_, _ = c.Writer.Write([]byte("data: "))
+			_, _ = c.Writer.Write([]byte(chunk))
+			_, _ = c.Writer.Write([]byte("\n\n"))
+			flusher.Flush()
 		case _, ok := <-stream.DoneCh:
 			if !ok {
 				return
@@ -107,7 +128,7 @@ func handleStreamingResponse(c *gin.Context, stream *core.PendingStream, nodeNam
 
 func handleNonStreamingResponse(c *gin.Context, stream *core.PendingStream, model string, nodeName string) {
 	var sb strings.Builder
-	timeout := time.NewTimer(120 * time.Second)
+	timeout := time.NewTimer(6000 * time.Second)
 	defer timeout.Stop()
 
 	for {
@@ -124,6 +145,7 @@ func handleNonStreamingResponse(c *gin.Context, stream *core.PendingStream, mode
 			}
 		case chunk, ok := <-stream.ChunkCh:
 			if ok {
+				timeout.Reset(6000 * time.Second)
 				sb.WriteString(chunk)
 			}
 		case _, ok := <-stream.DoneCh:
@@ -169,4 +191,22 @@ func openAIChunk(nodeName string, delta string) map[string]interface{} {
 			},
 		},
 	}
+}
+
+// extractAPIKey 从请求头中提取 API Key
+// 支持格式: Authorization: Bearer sk-xxxxx
+func extractAPIKey(c *gin.Context) string {
+	auth := strings.TrimSpace(c.GetHeader("Authorization"))
+	if auth == "" {
+		return ""
+	}
+
+	// 检查 Bearer 前缀
+	parts := strings.SplitN(auth, " ", 2)
+	if len(parts) == 2 && strings.EqualFold(parts[0], "Bearer") {
+		return strings.TrimSpace(parts[1])
+	}
+
+	// 如果没有 Bearer 前缀，直接返回整个值（兼容性考虑）
+	return auth
 }

@@ -202,7 +202,7 @@ func (a *nodeAgent) executeStreaming(requestID string, payload nodeDispatchPaylo
 		return
 	}
 
-	resp, err := doUpstreamRequest(reqBody)
+	resp, err := doUpstreamRequest(reqBody, true)
 	if err != nil {
 		a.sendStreamError(requestID, err)
 		return
@@ -230,11 +230,8 @@ func (a *nodeAgent) executeStreaming(requestID string, payload nodeDispatchPaylo
 			a.sendStreamEnd(requestID, "stop")
 			return
 		}
-		delta := extractDeltaFromOpenAIChunk(data)
-		global.GLB_LOG.Debug("Upstream Stream Chunk", zap.String("data", data), zap.String("delta", delta))
-		if delta != "" {
-			a.sendStreamChunk(requestID, delta)
-		}
+		global.GLB_LOG.Debug("Upstream Stream Chunk", zap.String("data", data))
+		a.sendStreamChunk(requestID, data)
 	}
 	if err := scanner.Err(); err != nil {
 		a.sendStreamError(requestID, err)
@@ -250,7 +247,7 @@ func (a *nodeAgent) executeNonStreaming(requestID string, payload nodeDispatchPa
 		return
 	}
 
-	resp, err := doUpstreamRequest(reqBody)
+	resp, err := doUpstreamRequest(reqBody, false)
 	if err != nil {
 		a.sendStreamError(requestID, err)
 		return
@@ -299,7 +296,7 @@ func (a *nodeAgent) sendStreamError(requestID string, err error) {
 	a.send(nodeWireMessage{Type: "stream_error", RequestID: requestID, Payload: b})
 }
 
-func doUpstreamRequest(body []byte) (*http.Response, error) {
+func doUpstreamRequest(body []byte, stream bool) (*http.Response, error) {
 	up := global.GLB_CONFIG.UpstreamLLM
 	base := strings.TrimRight(strings.TrimSpace(up.BaseURL), "/")
 	if base == "" {
@@ -313,9 +310,14 @@ func doUpstreamRequest(body []byte) (*http.Response, error) {
 		chatPath = "/" + chatPath
 	}
 
-	timeout := time.Duration(up.TimeoutSec) * time.Second
-	if timeout <= 0 {
-		timeout = 120 * time.Second
+	var timeout time.Duration
+	if stream {
+		timeout = 1800 * time.Second // 30 minutes for streaming
+	} else {
+		timeout = time.Duration(up.TimeoutSec) * time.Second
+		if timeout <= 0 {
+			timeout = 120 * time.Second
+		}
 	}
 
 	tr := &http.Transport{}

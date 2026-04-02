@@ -6,6 +6,7 @@ type Server struct {
 	Email     Email   `mapstructure:"email" json:"email" yaml:"email"`
 	System    System  `mapstructure:"system" json:"system" yaml:"system"`
 	Captcha   Captcha `mapstructure:"captcha" json:"captcha" yaml:"captcha"`
+	Security  Security `mapstructure:"security" json:"security" yaml:"security"`
 	// auto
 	AutoCode Autocode `mapstructure:"autocode" json:"autocode" yaml:"autocode"`
 	// gorm

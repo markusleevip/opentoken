@@ -6,6 +6,7 @@ OpenToken 是一个高性能、可扩展的 LLM（大语言模型）网关与分
 
 - **opentoken-server**: 中心控制节点，负责 API 路由、用户鉴权、节点管理、额度控制以及前端展示。
 - **opentoken-node**: 执行节点，负责与实际的 LLM 上游（如 OpenAI, Anthropic, Ollama 等）进行通信并流式回传结果。
+- **frontend**: Web 前端项目，基于 React + Vite + TypeScript 构建，提供系统管理和监控的用户界面。
 
 ## 核心特性
 
@@ -13,6 +14,26 @@ OpenToken 是一个高性能、可扩展的 LLM（大语言模型）网关与分
 - **高性能**: 基于 Go 语言开发，原生支持高并发长连接。
 - **流式回传**: 全链路流式响应支持。
 - **灵活配置**: 支持 MySQL/SQLite 存储，支持多种 OSS。
+
+---
+
+## 界面预览
+
+### 节点管理
+
+![在线节点](img/在线节点.png)
+
+![节点管理](img/节点管理.png)
+
+### 模型管理
+
+![可用模型列表](img/可用模型列表.png)
+
+### API 管理
+
+![API Key 管理](img/api%20key%20管理.png)
+
+![API使用文档](img/API使用文档.png)
 
 ---
 
@@ -89,6 +110,57 @@ upstream-llm:
 ```bash
 cd opentoken-node
 go run main.go
+```
+
+### 4. 前端配置与启动
+
+前端是基于 React + Vite + TypeScript 构建的 Web 应用。
+
+#### 4.1 前置要求
+
+- **Node.js**: 建议版本 18.x 或更高。
+- **npm** 或 **yarn**: 包管理器。
+
+#### 4.2 安装依赖
+
+进入前端目录并安装依赖：
+
+```bash
+cd frontend
+npm install
+```
+
+#### 4.3 开发模式
+
+启动开发服务器：
+
+```bash
+npm run dev
+```
+
+前端将在 `http://localhost:3000` 上运行。开发服务器会自动将 API 请求代理到后端服务器 `http://localhost:8084`。
+
+#### 4.4 生产环境构建
+
+构建生产环境前端：
+
+```bash
+npm run build
+```
+
+构建产物将生成在 `dist` 目录中。可以使用以下命令预览生产构建：
+
+```bash
+npm run preview
+```
+
+#### 4.5 测试环境
+
+用于测试目的，可以使用：
+
+```bash
+npm run test:dev    # 以测试模式启动开发服务器
+npm run test:build   # 构建测试环境
 ```
 
 ## 节点管理与监控
